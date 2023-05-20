@@ -35,12 +35,33 @@ async function run() {
     });
 
     app.get("/toys", async (req, res) => {
-      const cursor = toyCollection.find();
-      const result = await cursor.toArray();
-      res.send(result);
+      const { name } = req.query;
+
+      const limit = 20;
+
+      const query = {};
+
+      if (name) {
+        query.name = { $regex: name, $options: "i" };
+      }
+
+      const cursor = toyCollection.find(query).limit(limit);
+
+      try {
+        const result = await cursor.toArray();
+        res.send(result);
+      } catch (error) {
+        console.error("toys not availabe:", error);
+        res.status(500).send("toys not availabe");
+      }
     });
 
-    
+    app.post("/toys", async (req, res) => {
+      const toy = req.body;
+      console.log(toy);
+      const result = await toyCollection.insertOne(toy);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
