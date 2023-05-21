@@ -23,7 +23,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server (optional starting in v4.7)
-    await client.connect();
+    client.connect();
 
     const toyCollection = client.db("playwheels").collection("toys");
 
@@ -35,12 +35,18 @@ async function run() {
     });
 
     app.get("/toys", async (req, res) => {
-      const { email } = req.query;
+      const { email, sort } = req.query;
       const limit = 20;
       const query = email ? { email: email } : {};
       const cursor = toyCollection.find(query).limit(limit);
 
       try {
+        if (sort === "asc") {
+          cursor.sort({ price: 1 });
+        } else if (sort === "desc") {
+          cursor.sort({ price: -1 });
+        }
+
         const result = await cursor.toArray();
         res.send(result);
       } catch (error) {
