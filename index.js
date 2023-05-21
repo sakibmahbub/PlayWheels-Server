@@ -22,7 +22,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
+    // Connect the client to the server (optional starting in v4.7)
     await client.connect();
 
     const toyCollection = client.db("playwheels").collection("toys");
@@ -35,24 +35,17 @@ async function run() {
     });
 
     app.get("/toys", async (req, res) => {
-      const { name } = req.query;
-
+      const { email } = req.query;
       const limit = 20;
-
-      const query = {};
-
-      if (name) {
-        query.name = { $regex: name, $options: "i" };
-      }
-
+      const query = email ? { email: email } : {};
       const cursor = toyCollection.find(query).limit(limit);
 
       try {
         const result = await cursor.toArray();
         res.send(result);
       } catch (error) {
-        console.error("toys not available:", error);
-        res.status(500).send("toys not available");
+        console.error("Toys not available:", error);
+        res.status(500).send("Toys not available");
       }
     });
 
@@ -68,11 +61,14 @@ async function run() {
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error);
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
   }
 }
+
 run().catch(console.dir);
 
 app.get("/", (req, res) => {
