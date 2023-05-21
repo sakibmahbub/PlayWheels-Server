@@ -51,8 +51,8 @@ async function run() {
         const result = await cursor.toArray();
         res.send(result);
       } catch (error) {
-        console.error("toys not availabe:", error);
-        res.status(500).send("toys not availabe");
+        console.error("toys not available:", error);
+        res.status(500).send("toys not available");
       }
     });
 
